@@ -29,7 +29,6 @@
 
 #include <OgreSceneNode.h>
 #include <OgreSceneManager.h>
-#include <QTimer>
 
 #include <urdf/model.h>
 
@@ -114,7 +113,10 @@ void RobotModelDisplay::updateAlpha()
 void RobotModelDisplay::updateRobotDescription()
 {
   if( isEnabled() )
+  {
     load();
+    context_->queueRender();
+  }
 }
 
 void RobotModelDisplay::updateVisualVisible()
@@ -138,7 +140,6 @@ void RobotModelDisplay::updateTfPrefix()
 void RobotModelDisplay::load()
 {
   clearStatuses();
-  context_->queueRender();
 
   std::string content;
   if( !update_nh_.getParam( robot_description_property_->getStdString(), content ))
@@ -154,8 +155,6 @@ void RobotModelDisplay::load()
       setStatus( StatusProperty::Error, "URDF",
                  "Parameter [" + robot_description_property_->getString()
                  + "] does not exist, and was not found by searchParam()" );
-      // try again in a second
-      QTimer::singleShot(1000, this, SLOT(updateRobotDescription()));
       return;
     }
   }
